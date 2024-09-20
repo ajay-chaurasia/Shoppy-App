@@ -5,6 +5,7 @@ import com.cart.shoppy.exceptions.EntityNotFoundException;
 import com.cart.shoppy.model.Category;
 import com.cart.shoppy.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
+    @Autowired
     private CategoryRepository categoryRepository;
 
     @Override
