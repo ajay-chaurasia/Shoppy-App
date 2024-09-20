@@ -1,6 +1,7 @@
 package com.cart.shoppy.controller;
 
 import com.cart.shoppy.exceptions.AlreadyExistsException;
+import com.cart.shoppy.exceptions.EntityNotFoundException;
 import com.cart.shoppy.model.Category;
 import com.cart.shoppy.response.ApiResponse;
 import com.cart.shoppy.service.category.ICategoryService;
@@ -37,5 +38,43 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ApiResponse> getCategoryById(@PathVariable Long id) {
+        try {
+            Category category = categoryService.getCategoryById(id);
+            return ResponseEntity.ok(new ApiResponse("Found!", category));
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
+        }
+    }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ApiResponse> getCategoryByName(@PathVariable String name) {
+        try {
+            Category category = categoryService.getCategoryByName(name);
+            return ResponseEntity.ok(new ApiResponse("Found!", category));
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        try {
+            Category updatedCategory = categoryService.updateCategory(category, id);
+            return ResponseEntity.ok(new ApiResponse("Updated the Category:", updatedCategory));
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteCategoryById(@PathVariable Long id) {
+        try {
+            categoryService.deleteCategoryById(id);
+            return ResponseEntity.ok(new ApiResponse("Deleted!", null));
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
+        }
+    }
 }

@@ -14,8 +14,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
-    @Autowired
-    private CategoryRepository categoryRepository;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Category getCategoryById(Long id) {
