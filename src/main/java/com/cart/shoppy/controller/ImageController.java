@@ -6,6 +6,10 @@ import com.cart.shoppy.model.Image;
 import com.cart.shoppy.response.ApiResponse;
 import com.cart.shoppy.service.image.IImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,22 +25,30 @@ public class ImageController {
     private final IImageService imageService;
 
     @PostMapping("/upload")
-    public ResponseEntity<ApiResponse> uploadImages(@RequestParam List<MultipartFile> files, @RequestParam Long productId) {
+    public ResponseEntity<ApiResponse> uploadImages(
+            @RequestParam List<MultipartFile> files,
+            @RequestParam Long productId
+    ) {
         try {
             List<ImageDto> imageDTOs = imageService.saveImages(productId, files);
             return ResponseEntity.ok(new ApiResponse("Upload successful!", imageDTOs));
         } catch (Exception exception) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Upload failed!", exception.getMessage()));
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse("Upload failed!", exception.getMessage()));
         }
     }
 
     @GetMapping("/{imageId}")
-    public ResponseEntity<ApiResponse> downloadImageById(@PathVariable Long imageId) {
+    public ResponseEntity<Resource> downloadImageById(@PathVariable Long imageId) {
         try {
             Image image = imageService.getImageById(imageId);
-            return ResponseEntity.ok(new ApiResponse("Found!", image));
+            ByteArrayResource resource = new ByteArrayResource(image.getImage());
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.getFileType()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +image.getFileName() + "\"")
+                    .body(resource);
         } catch (EntityNotFoundException exception) {
-            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
+            return new ResponseEntity<Resource>(new ByteArrayResource(new byte[0]), NOT_FOUND);
+//            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(exception.getMessage(), null));
         }
     }
 
@@ -51,7 +63,8 @@ public class ImageController {
         } catch (EntityNotFoundException exception) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Upload failed!", null));
         }
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Upload failed!", INTERNAL_SERVER_ERROR));
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("Upload failed!", INTERNAL_SERVER_ERROR));
     }
 
     @DeleteMapping("/{imageId}")
@@ -65,6 +78,7 @@ public class ImageController {
         } catch (EntityNotFoundException exception) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Delete failed!", null));
         }
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Upload failed!", INTERNAL_SERVER_ERROR));
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("Upload failed!", INTERNAL_SERVER_ERROR));
     }
 }

@@ -1,5 +1,6 @@
 package com.cart.shoppy.service.product;
 
+import com.cart.shoppy.dto.ProductDto;
 import com.cart.shoppy.model.Product;
 import com.cart.shoppy.request.AddProductRequest;
 import com.cart.shoppy.request.ProductUpdateRequest;
@@ -18,4 +19,7 @@ public interface IProductService {
     List<Product> getProductsByName(String name);
     List<Product> getProductsByBrandAndName(String brand, String name);
     Long countProductsByBrandAndName(String brand, String name);
+
+    ProductDto convertToDto(Product product);
+    List<ProductDto> getAllProductDTOs(List<Product> products);
 }

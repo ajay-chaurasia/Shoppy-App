@@ -8,6 +8,7 @@ import com.cart.shoppy.repository.ImageRepository;
 import com.cart.shoppy.service.product.IProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public class ImageService implements IImageService {
 
     private final ImageRepository imageRepository;
     private final IProductService productService;
+    private final ModelMapper modelMapper;
 
     @Override
     public Image getImageById(Long id) {
@@ -94,5 +96,14 @@ public class ImageService implements IImageService {
                     return imageDto;
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Image not found!"));
+    }
+
+    @Override
+    public List<ImageDto> getImageDtoByProductId(Long productId) {
+        List<Image> images = imageRepository.findByProductId(productId);
+        List<ImageDto> imageDTOs = images.stream()
+                .map((image) -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        return imageDTOs;
     }
 }

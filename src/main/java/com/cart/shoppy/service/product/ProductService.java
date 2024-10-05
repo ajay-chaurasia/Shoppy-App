@@ -1,13 +1,18 @@
 package com.cart.shoppy.service.product;
 
+import com.cart.shoppy.dto.ImageDto;
+import com.cart.shoppy.dto.ProductDto;
 import com.cart.shoppy.exceptions.EntityNotFoundException;
 import com.cart.shoppy.model.Category;
+import com.cart.shoppy.model.Image;
 import com.cart.shoppy.model.Product;
 import com.cart.shoppy.repository.CategoryRepository;
+import com.cart.shoppy.repository.ImageRepository;
 import com.cart.shoppy.repository.ProductRepository;
 import com.cart.shoppy.request.AddProductRequest;
 import com.cart.shoppy.request.ProductUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +24,8 @@ public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
+    private final ModelMapper modelMapper;
 
     private Product createProduct(AddProductRequest request, Category category) {
         return new Product(
@@ -113,5 +120,21 @@ public class ProductService implements IProductService {
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<Image> images = imageRepository.findByProductId(productDto.getId());
+        List<ImageDto> imageDTOs = images.stream()
+                .map((image) -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        productDto.setImages(imageDTOs);
+        return productDto;
+    }
+
+    @Override
+    public List<ProductDto> getAllProductDTOs(List<Product> products) {
+        return products.stream().map(this::convertToDto).toList();
     }
 }
