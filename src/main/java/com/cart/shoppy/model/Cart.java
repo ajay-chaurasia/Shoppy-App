@@ -25,8 +25,8 @@ public class Cart {
     private Set<CartItem> cartItems = new HashSet<>();
 
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     public void addItem(CartItem cartItem) {
         this.cartItems.add(cartItem);

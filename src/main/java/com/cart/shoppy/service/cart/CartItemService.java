@@ -20,7 +20,7 @@ public class CartItemService implements ICartItemService {
     @Override
     public void addItemToCart(Long cartId, Long productId, int quantity) {
         // 1. Get the cart
-        // 2. Get the product
+        // 2. Get the product1
         // 3. Check if product already exists in the cart
         // If yes, then increase the quantity
         // If no, add the product as new cart item
